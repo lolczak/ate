@@ -12,14 +12,14 @@ object AteApp extends App {
 
   def ls[F[_]](args: List[ShellExpr[F]])(implicit ev: DirCmd :<: F): ShellExpr[F] = ShellExpr.inject(LsCmd(args): DirCmd[ShellExpr[F]])
 
-  def str[F[_]](value: String)(implicit ev: Argument :<: F): ShellExpr[F] = ShellExpr.inject(Argument[ShellExpr[F]](value))
+  def arg[F[_]](value: String)(implicit ev: Argument :<: F): ShellExpr[F] = ShellExpr.inject(Argument[ShellExpr[F]](value))
 
   println("Starting...")
 
-  val eval = Interpreter.eval(ls[T](List(str[T]("dir1"), str[T]("dir2"))))
+  val eval = Interpreter.eval(ls[T](List(arg[T]("dir1"), arg[T]("dir2"))))
 
   val (runtime, result) = eval.run(RunTime()).value
 
-  println(result.outputStr)
+  println(result)
 
 }
