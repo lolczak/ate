@@ -10,7 +10,7 @@ object CmdParser extends Parsers with PackratParsers {
 
   type Elem = Char
 
-  def parse(cmdSource: String): Either[String, ShellExp] = {
+  def parse(cmdSource: String): Either[String, ExpAst] = {
     parseGrammar(new CharArrayReader(cmdSource.toCharArray)) match {
       case Success(exp, next) => Right(exp)
       case err: NoSuccess     => Left(err.toString)
@@ -30,11 +30,11 @@ object CmdParser extends Parsers with PackratParsers {
       else Failure("no end of input", in)
     }
 
-  lazy val parseGrammar: Parser[ShellExp] = shellExp <~ endOfExp
+  lazy val parseGrammar: Parser[ExpAst] = shellExp <~ endOfExp
 
-  lazy val shellExp: Parser[ShellExp] = compoundCmd | singleCmd
+  lazy val shellExp: Parser[ExpAst] = compoundCmd | singleCmd
 
-  lazy val compoundCmd: Parser[ShellExp] =
+  lazy val compoundCmd: Parser[ExpAst] =
     (singleCmd <~ opt(whitespace)) ~ (combinator <~ opt(whitespace)) ~ shellExp ^^ {
       case exp1 ~ "|"  ~ exp2 => PipeCombinator(exp1, exp2)
       case exp1 ~ "||" ~ exp2 => OrCombinator(exp1, exp2)
