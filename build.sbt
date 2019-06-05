@@ -21,6 +21,8 @@ libraryDependencies ++= Seq(
 
 lazy val `string-matchers` = project in file(".")
 
+addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.1")
+
 scalacOptions ++= Seq(
     "-feature",
     "-unchecked",
