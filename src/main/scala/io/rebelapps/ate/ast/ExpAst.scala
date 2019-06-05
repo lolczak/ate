@@ -2,11 +2,11 @@ package io.rebelapps.ate.ast
 
 sealed trait ExpAst
 
-case class Cmd(name: String, args: List[Argument]) extends ExpAst
+case class CmdAst(name: String, args: List[ArgumentAst]) extends ExpAst
 
-object Cmd {
+object CmdAst {
 
-  def apply(name: String, args: Argument*): Cmd = Cmd(name, List(args: _*))
+  def apply(name: String, args: ArgumentAst*): CmdAst = CmdAst(name, List(args: _*))
 
 }
 

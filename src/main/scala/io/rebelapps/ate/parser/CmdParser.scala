@@ -44,19 +44,19 @@ object CmdParser extends Parsers with PackratParsers {
 
   lazy val combinator: Parser[String] = "||" | "&&" | ";" | "|"
 
-  lazy val singleCmd: Parser[Cmd] = cmdName ~ opt(whitespace ~> arguments) ^^ { case name ~ maybeArgs => Cmd(name, maybeArgs.getOrElse(List.empty): _*) }
+  lazy val singleCmd: Parser[CmdAst] = cmdName ~ opt(whitespace ~> arguments) ^^ { case name ~ maybeArgs => CmdAst(name, maybeArgs.getOrElse(List.empty): _*) }
 
   lazy val endOfExp = (opt(whitespace) ~ (eot  | (";" ~ eot))).named("end of cmd")
 
   lazy val cmdName = rep1(elem("any char", ch => (ch >= 33 && ch <=126 && ch != ';' && ch != '&' && ch != '|') || ch.isLetter || ch == '_' || ch == '-' )) ^^ { chars => chars.mkString }
 
-  lazy val argument: Parser[Argument] = (not(combinator) ~> (doubleQuotedArg | singleQuotedArg | cmdSubstitutionExp | simpleArg)).named("arg")
+  lazy val argument: Parser[ArgumentAst] = (not(combinator) ~> (doubleQuotedArg | singleQuotedArg | cmdSubstitutionExp | simpleArg)).named("arg")
 
-  lazy val doubleQuotedArg: Parser[Argument] = '\"' ~> rep1("\\\"" | elem("not dbl qt", _ != '\"')) <~ '\"' ^^ { chars => DoubleQuoted(chars.mkString) }
+  lazy val doubleQuotedArg: Parser[ArgumentAst] = '\"' ~> rep1("\\\"" | elem("not dbl qt", _ != '\"')) <~ '\"' ^^ { chars => DoubleQuoted(chars.mkString) }
 
-  lazy val singleQuotedArg: Parser[Argument] = '\'' ~> rep1("\\\'" | elem("not sngl qt", _ != '\'')) <~ '\'' ^^ { chars => SingleQuoted(chars.mkString) }
+  lazy val singleQuotedArg: Parser[ArgumentAst] = '\'' ~> rep1("\\\'" | elem("not sngl qt", _ != '\'')) <~ '\'' ^^ { chars => SingleQuoted(chars.mkString) }
 
-  lazy val cmdSubstitutionExp: Parser[Argument] =
+  lazy val cmdSubstitutionExp: Parser[ArgumentAst] =
     for {
       expString <- cmdSubstitution | backQuotesCmdSubstitution
       cmdExp    <- Parser { in =>
@@ -71,9 +71,9 @@ object CmdParser extends Parsers with PackratParsers {
 
   lazy val backQuotesCmdSubstitution: Parser[String] = '`' ~> rep1("\\`" | elem("not sngl qt", _ != '`')) <~ '`' ^^ { chars => chars.mkString }
 
-  lazy val simpleArg: Parser[Argument] = rep1(not(combinator) ~> printable) ^^ { chars => SimpleArgument(chars.mkString) } named "simple arg"
+  lazy val simpleArg: Parser[ArgumentAst] = rep1(not(combinator) ~> printable) ^^ { chars => SimpleArgumentAst(chars.mkString) } named "simple arg"
 
-  lazy val arguments: Parser[List[Argument]] = separatedSequence(argument, whitespace, endOfArgs).named("args")
+  lazy val arguments: Parser[List[ArgumentAst]] = separatedSequence(argument, whitespace, endOfArgs).named("args")
 
   lazy val endOfArgs = (opt(whitespace) ~ guard(eot | combinator)).named("end of args")
 
