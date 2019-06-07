@@ -1,7 +1,8 @@
 package io.rebelapps.ate.interpreter.argument
 
-import cats.{Applicative, Traverse}
+import cats.{Applicative, Monad, Traverse}
 import cats.data.State
+import cats.mtl.MonadState
 import io.rebelapps.ate.interpreter.{Eval, EvalResult, Result, RunTime}
 import io.rebelapps.ate.util.data.Fix
 import io.rebelapps.ate.util.syntax.:<:
@@ -15,8 +16,9 @@ object Argument {
   implicit val argInterpreter = ArgHoneypotInterpreter
 
   implicit val argEval = new Eval[Argument] {
-    override def eval(exp: Argument[Result])(implicit F: Traverse[Argument]): State[RunTime, Result] =
-      State.pure(EvalResult(List(exp.value)))
+    override def eval[G[_]](exp: Argument[Result])
+                           (implicit F: Traverse[Argument], G0: MonadState[G, RunTime], G1: Monad[G]): G[Result] =
+      G1.point(EvalResult(List(exp.value)))
   }
 
   implicit val argTraverse = new Traverse[Argument] {

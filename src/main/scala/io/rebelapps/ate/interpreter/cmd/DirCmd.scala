@@ -1,8 +1,9 @@
 package io.rebelapps.ate.interpreter.cmd
 
-import cats.{Applicative, Traverse}
+import cats.{Applicative, Monad, Traverse}
 import cats.data.State
 import cats.implicits._
+import cats.mtl.MonadState
 import io.rebelapps.ate.interpreter.{Eval, Result, RunResult, RunTime}
 import io.rebelapps.ate.util.data.Fix
 import io.rebelapps.ate.util.syntax.:<:
@@ -18,13 +19,15 @@ object DirCmd {
   implicit val dirInterpreter = DirHoneypotInterpreter
 
   implicit val dirEval = new Eval[DirCmd] {
-    override def eval(exp: DirCmd[Result])(implicit F: Traverse[DirCmd]): State[RunTime, Result] = {
+
+    override def eval[G[_]](exp: DirCmd[Result])(implicit F: Traverse[DirCmd], G0: MonadState[G, RunTime], G1: Monad[G]): G[Result] =
       exp match {
         case LsCmd(args) =>
           val x = args.flatMap(_.fold(_.results)(run => List(run.outputStr)))
-          State.pure(RunResult().putLn(x.mkString(" "))) //todo stdout change
+
+          G1.point(RunResult().putLn(x.mkString(" "))) //todo stdout change
       }
-    }
+
   }
 
   implicit val dirTraverse = new Traverse[DirCmd] {
@@ -40,6 +43,7 @@ object DirCmd {
     override def foldLeft[A, B](fa: DirCmd[A], b: B)(f: (B, A) => B): B = ???
 
     override def foldRight[A, B](fa: DirCmd[A], lb: cats.Eval[B])(f: (A, cats.Eval[B]) => cats.Eval[B]): cats.Eval[B] = ???
+
   }
 
 }
