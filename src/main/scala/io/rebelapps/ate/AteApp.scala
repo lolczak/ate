@@ -20,7 +20,6 @@ object AteApp extends App {
   println(result)
 
   //todo 1) pipe combinator cat file | grep dupa
-  //todo 2) interpreters to separate class
   //todo 3) tagless final or hkp
   //todo 4) foldMap AST
   //todo 5) vfs
