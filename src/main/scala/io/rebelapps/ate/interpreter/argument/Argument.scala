@@ -1,19 +1,14 @@
 package io.rebelapps.ate.interpreter.argument
 
-import cats.data.State
-import cats.implicits._
-import io.rebelapps.ate.interpreter.{EvalResult, Interpreter, RunTime, ShellExpr}
-import io.rebelapps.ate.util.syntax.\/
+import io.rebelapps.ate.interpreter.ShellExpr
+import io.rebelapps.ate.util.syntax.:<:
 
 case class Argument[F](value: String)
 
 object Argument {
 
-  implicit val argInterpreter = new Interpreter[Argument] {
+  def arg[F[_]](value: String)(implicit ev: Argument :<: F): ShellExpr[F] = ShellExpr.inject(Argument[ShellExpr[F]](value))
 
-    override def eval[G[_]](expr: Argument[ShellExpr[G]])(implicit G: Interpreter[G]): State[RunTime, List[String] \/ EvalResult] =
-      State.pure(List(expr.value).asLeft)
-
-  }
+  implicit val argInterpreter = ArgHoneypotInterpreter
 
 }

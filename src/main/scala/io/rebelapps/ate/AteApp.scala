@@ -2,17 +2,14 @@ package io.rebelapps.ate
 
 import cats.data.EitherK
 import io.rebelapps.ate.interpreter.argument.Argument
-import io.rebelapps.ate.interpreter.cmd.{DirCmd, LsCmd}
-import io.rebelapps.ate.interpreter.{Interpreter, RunTime, ShellExpr}
-import io.rebelapps.ate.util.syntax.:<:
+import io.rebelapps.ate.interpreter.argument.Argument.arg
+import io.rebelapps.ate.interpreter.cmd.DirCmd
+import io.rebelapps.ate.interpreter.cmd.DirCmd.ls
+import io.rebelapps.ate.interpreter.{Interpreter, RunTime}
 
 object AteApp extends App {
 
   type T[A] = EitherK[Argument, DirCmd, A]
-
-  def ls[F[_]](args: List[ShellExpr[F]])(implicit ev: DirCmd :<: F): ShellExpr[F] = ShellExpr.inject(LsCmd(args): DirCmd[ShellExpr[F]])
-
-  def arg[F[_]](value: String)(implicit ev: Argument :<: F): ShellExpr[F] = ShellExpr.inject(Argument[ShellExpr[F]](value))
 
   println("Starting...")
 
@@ -22,4 +19,9 @@ object AteApp extends App {
 
   println(result)
 
+  //todo 1) pipe combinator cat file | grep dupa
+  //todo 2) interpreters to separate class
+  //todo 3) tagless final or hkp
+  //todo 4) foldMap AST
+  //todo 5) vfs
 }
