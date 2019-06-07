@@ -5,7 +5,7 @@ import io.rebelapps.ate.interpreter.argument.Argument
 import io.rebelapps.ate.interpreter.argument.Argument.arg
 import io.rebelapps.ate.interpreter.cmd.DirCmd
 import io.rebelapps.ate.interpreter.cmd.DirCmd.ls
-import io.rebelapps.ate.interpreter.{Interpreter, RunTime}
+import io.rebelapps.ate.interpreter.{Eval, Interpreter, RunTime}
 
 object AteApp extends App {
 
@@ -13,7 +13,8 @@ object AteApp extends App {
 
   println("Starting...")
 
-  val eval = Interpreter.eval(ls[T](List(arg[T]("dir1"), arg[T]("dir2"))))
+//  val eval = Interpreter.eval(ls[T](List(arg[T]("dir1"), arg[T]("dir2"))))
+  val eval = Eval.eval(ls[T](List(arg[T]("dir1"), arg[T]("dir2"))))
 
   val (runtime, result) = eval.run(RunTime()).value
 
