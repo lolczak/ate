@@ -1,6 +1,7 @@
 package io.rebelapps.ate.util.data
 
-import cats.Functor
+import cats.{Functor, Monad, Traverse}
+import cats.implicits._
 import io.rebelapps.ate.util.syntax.:<:
 
 case class Fix[F[_]](in: F[Fix[F]])
@@ -9,8 +10,11 @@ object Fix {
 
   def unFix[F[_]](f: Fix[F]): F[Fix[F]] = f.in
 
-  def foldExpr[A, F[_]](algebra: F[A] => A)(expr: Fix[F])(implicit F: Functor[F]): A =
-    algebra(F.map(expr.in)(foldExpr(algebra)))
+  def cata[A, F[_]](algebra: F[A] => A)(expr: Fix[F])(implicit F: Functor[F]): A =
+    algebra(F.map(unFix(expr))(cata(algebra)))
+
+  def cataM[A, F[_], M[_]](algebra: F[A] => M[A])(expr: Fix[F])(implicit F: Traverse[F], M: Monad[M]): M[A] =
+    F.traverse(unFix(expr))(cataM(algebra)) >>= algebra
 
   def inject[F[_], G[_]](g: G[Fix[F]])(implicit ev: G :<: F): Fix[F] = Fix[F](ev.inj(g))
 
@@ -43,6 +47,9 @@ cata f = f . fmap (cata f) . unFix
 
 cataM :: (Traversable f, Monad m) => (f a -> m a) -> Fix f -> m a
 cataM f = f <=< traverse (cataM f) <<< unFix
+
+(<=<) :: Monad m => (b -> m c) -> (a -> m b) -> a -> m c
+Category cat => cat b c -> cat a b -> cat a c
 
 cataW :: (Cotraversable f, Comonad ɯ) => (ɯ (f a) -> a) -> ɯ (Fix f) -> a
 cataW f = f =<= cotraverse (cataW f) <<< fmap unFix
