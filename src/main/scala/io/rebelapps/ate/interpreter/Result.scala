@@ -1,7 +1,19 @@
 package io.rebelapps.ate.interpreter
 
-case class EvalResult(output: Vector[Output] = Vector.empty,
-                      exitCode: ExitCode = Ok) {
+sealed trait Result {
+
+  def fold[A](f: EvalResult => A)(g: RunResult => A): A =
+    this match {
+      case e: EvalResult => f(e)
+      case r: RunResult  => g(r)
+    }
+
+}
+
+case class EvalResult(results: List[String]) extends Result
+
+case class RunResult(output: Vector[Output] = Vector.empty,
+                      exitCode: ExitCode = Ok) extends Result {
 
   lazy val outputStr =
     if (output.isEmpty) ""
@@ -12,7 +24,7 @@ case class EvalResult(output: Vector[Output] = Vector.empty,
       }
     }
 
-  def putLn(line: String): EvalResult = this.copy(output :+ StdOut(line))
+  def putLn(line: String): RunResult = this.copy(output :+ StdOut(line))
 
 }
 
