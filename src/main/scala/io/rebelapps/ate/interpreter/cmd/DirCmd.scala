@@ -1,9 +1,8 @@
 package io.rebelapps.ate.interpreter.cmd
 
-import cats.{Applicative, Monad, Traverse}
-import cats.data.State
 import cats.implicits._
 import cats.mtl.MonadState
+import cats.{Applicative, Monad, Traverse}
 import io.rebelapps.ate.interpreter.{Eval, Result, RunResult, RunTime}
 import io.rebelapps.ate.util.data.Fix
 import io.rebelapps.ate.util.syntax.:<:
@@ -31,6 +30,7 @@ object DirCmd {
   }
 
   implicit val dirTraverse = new Traverse[DirCmd] {
+
     override def traverse[G[_], A, B](fa: DirCmd[A])(f: A => G[B])(implicit evidence$1: Applicative[G]): G[DirCmd[B]] = {
       fa match {
         case LsCmd(args) =>
