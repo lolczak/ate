@@ -10,7 +10,7 @@ object CmdParser extends Parsers with PackratParsers {
 
   type Elem = Char
 
-  def parse(cmdSource: String): Either[String, ExpAst] = {
+  def parse(cmdSource: String): Either[String, ShellExpr] = {
     parseGrammar(new CharArrayReader(cmdSource.toCharArray)) match {
       case Success(exp, next) => Right(exp)
       case err: NoSuccess     => Left(err.toString)
@@ -30,11 +30,11 @@ object CmdParser extends Parsers with PackratParsers {
       else Failure("no end of input", in)
     }
 
-  lazy val parseGrammar: Parser[ExpAst] = shellExp <~ endOfExp
+  lazy val parseGrammar: Parser[ShellExpr] = shellExp <~ endOfExp
 
-  lazy val shellExp: Parser[ExpAst] = compoundCmd | singleCmd
+  lazy val shellExp: Parser[ShellExpr] = compoundCmd | singleCmd
 
-  lazy val compoundCmd: Parser[ExpAst] =
+  lazy val compoundCmd: Parser[ShellExpr] =
     (singleCmd <~ opt(whitespace)) ~ (combinator <~ opt(whitespace)) ~ shellExp ^^ {
       case exp1 ~ "|"  ~ exp2 => PipeCombinator(exp1, exp2)
       case exp1 ~ "||" ~ exp2 => OrCombinator(exp1, exp2)
@@ -44,7 +44,7 @@ object CmdParser extends Parsers with PackratParsers {
 
   lazy val combinator: Parser[String] = "||" | "&&" | ";" | "|"
 
-  lazy val singleCmd: Parser[CmdAst] = cmdName ~ opt(whitespace ~> arguments) ^^ { case name ~ maybeArgs => CmdAst(name, maybeArgs.getOrElse(List.empty): _*) }
+  lazy val singleCmd: Parser[Cmd] = cmdName ~ opt(whitespace ~> arguments) ^^ { case name ~ maybeArgs => Cmd(name, maybeArgs.getOrElse(List.empty): _*) }
 
   lazy val endOfExp = (opt(whitespace) ~ (eot  | (";" ~ eot))).named("end of cmd")
 

