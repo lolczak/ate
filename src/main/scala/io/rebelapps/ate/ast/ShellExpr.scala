@@ -1,6 +1,6 @@
 package io.rebelapps.ate.ast
 
-sealed trait ShellExpr
+trait ShellExpr
 
 case class Cmd(name: String, args: List[ArgumentAst]) extends ShellExpr
 
