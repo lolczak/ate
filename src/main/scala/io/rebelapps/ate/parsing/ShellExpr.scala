@@ -1,4 +1,4 @@
-package io.rebelapps.ate.ast
+package io.rebelapps.ate.parsing
 
 trait ShellExpr
 

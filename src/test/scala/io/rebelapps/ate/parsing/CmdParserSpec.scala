@@ -1,8 +1,8 @@
-package io.rebelapps.ate.parser
+package io.rebelapps.ate.parsing
 
-import io.rebelapps.ate.ast._
+import io.rebelapps.ate.parsing._
 import org.scalatest.{FlatSpec, Matchers}
-import io.rebelapps.ate.parser.CmdParser._
+import io.rebelapps.ate.parsing.CmdParser._
 
 class CmdParserSpec extends FlatSpec with Matchers {
 

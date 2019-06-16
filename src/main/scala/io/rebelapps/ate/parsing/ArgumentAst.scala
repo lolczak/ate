@@ -1,4 +1,4 @@
-package io.rebelapps.ate.ast
+package io.rebelapps.ate.parsing
 
 sealed trait ArgumentAst extends ShellExpr
 case class SimpleArgumentAst(value: String)  extends ArgumentAst

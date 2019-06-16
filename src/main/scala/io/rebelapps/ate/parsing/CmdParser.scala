@@ -1,6 +1,4 @@
-package io.rebelapps.ate.parser
-
-import io.rebelapps.ate.ast._
+package io.rebelapps.ate.parsing
 
 import scala.language.implicitConversions
 import scala.util.parsing.combinator.{PackratParsers, Parsers}
