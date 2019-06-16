@@ -1,7 +1,6 @@
 package io.rebelapps.ate.interpreter.argument
 
 import cats.{Applicative, Monad, Traverse}
-import cats.data.State
 import cats.mtl.MonadState
 import io.rebelapps.ate.interpreter.{Eval, EvalResult, Result, RunTime}
 import io.rebelapps.ate.util.data.Fix
