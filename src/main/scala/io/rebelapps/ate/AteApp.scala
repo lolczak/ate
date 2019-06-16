@@ -9,8 +9,8 @@ import io.rebelapps.ate.interpreter.cmd.dir.DirCmd.ls
 import io.rebelapps.ate.interpreter.cmd.dir.{DirCmd, DirTransformer}
 import io.rebelapps.ate.interpreter.{Eval, HoneypotInstances, RunTime}
 import io.rebelapps.ate.parsing.CmdParser
-import io.rebelapps.ate.transform.Ytransform
 import io.rebelapps.ate.util.data.Fix
+import io.rebelapps.ate.util.functions._
 
 import scala.io.StdIn
 
@@ -20,21 +20,8 @@ object AteApp extends App with HoneypotInstances {
 
   println("Starting...")
 
-  val dirTransformer = new DirTransformer[T]()
-  val catTransformer = new CatTransformer[T]()
-  val argTransformer = new ArgTransformer[T]()
+  val transformer = new DirTransformer[T]() |+| new CatTransformer[T]() |+| new ArgTransformer[T]()
 
-  val transformer = dirTransformer |+| catTransformer |+| argTransformer
-
-  def Y[A,B](f: (A=>B)=>(A=>B)) = {
-    case class W(wf: W=>A=>B) {
-      def apply(w: W) = wf(w)
-    }
-    val g: W=>A=>B = w => f(w(w))(_)
-    g(W(g))
-  }
-
-//  val transform = Ytransform(Seq(transformer.transform(_)))
   val transform = Y(transformer.transform(_))
 
   val expr: Fix[T] = ls[T](List(arg[T]("dir1"), arg[T]("dir2")))
