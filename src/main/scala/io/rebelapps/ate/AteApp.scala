@@ -46,7 +46,6 @@ object AteApp extends App {
   val mapper = Pcombinator(Seq(lsMapper(_), argMapper(_)))
 
 
-  //  val eval = Interpreter.eval(ls[T](List(arg[T]("dir1"), arg[T]("dir2"))))
   val expr: Fix[T] = ls[T](List(arg[T]("dir1"), arg[T]("dir2")))
 
   val eval = Eval.eval[T, State[RunTime, ?]](expr)

@@ -12,8 +12,6 @@ object Argument {
 
   def arg[F[_]](value: String)(implicit ev: Argument :<: F): Fix[F] = Fix.inject(Argument[Fix[F]](value))
 
-  implicit val argInterpreter = ArgHoneypotInterpreter
-
   implicit val argEval = new Eval[Argument] {
     override def eval[G[_]](exp: Argument[Result])
                            (implicit F: Traverse[Argument], G0: MonadState[G, RunTime], G1: Monad[G]): G[Result] =
