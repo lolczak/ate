@@ -16,6 +16,7 @@ lazy val testLibs = Seq(
 libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "cats-mtl-core" % "0.5.0",
+  "co.fs2" %% "fs2-core" % "1.0.4",
   "com.chuusai" %% "shapeless" % shapelessVersion
 ) ++ testLibs
 
